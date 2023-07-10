@@ -33,8 +33,9 @@
 
   type ComponentDomMapping = {
     scripts: Array<HTMLScriptElement>;
-    scriptFunctions: Array<any>;
-    styles: Array<any>;
+    scriptFunctions: Array<HTMLScriptElement>;
+    styles: Array<HTMLDivElement>;
+    links: Array<HTMLLinkElement>
   };
   const componentsDomMapping: Record<string, ComponentDomMapping> = {};
 
@@ -45,7 +46,7 @@
     const searchParams = props
       ? "?" + new URLSearchParams(props).toString()
       : "";
-    const { scripts, scriptFunctions, renderGateContent, styles } = (await (
+    const { scripts, scriptFunctions, renderGateContent, styles, links } = (await (
       await fetch(`/api/component/${component}${searchParams}`)
     ).json()) as ExtractedElements;
     if (!renderGateContent) {
@@ -56,6 +57,7 @@
       scripts: [],
       scriptFunctions: [],
       styles: [],
+      links: []
     };
 
     scripts.map((script) => {
@@ -74,6 +76,14 @@
       componentMapping.scriptFunctions.push(scriptTag);
     });
 
+    links.forEach(link => {
+      const linkTag = document.createElement("link");
+      linkTag.rel = 'stylesheet'
+      linkTag.href = link;
+      document.head.appendChild(linkTag)
+      componentMapping.links.push(linkTag);
+    })
+
     loadZone.innerHTML = renderGateContent;
 
     styles.forEach((style) => {
@@ -82,6 +92,7 @@
       document.body.appendChild(styleContainerTag);
       componentMapping.styles.push(styleContainerTag);
     });
+
     componentsDomMapping[component] = componentMapping;
   };
 
@@ -94,6 +105,7 @@
       mapping.scripts.forEach((s) => s.remove());
       mapping.scriptFunctions.forEach((s) => s.remove());
       mapping.styles.forEach((s) => s.remove());
+      mapping.links.forEach((l) => l.remove());
     }
   };
 

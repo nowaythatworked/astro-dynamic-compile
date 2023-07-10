@@ -4,16 +4,19 @@ export interface ExtractedElements {
   scripts: string[];
   scriptFunctions: string[];
   styles: string[];
+  links: string[];
   renderGateContent: string | null;
 }
 
 function extractElements(htmlString: string): ExtractedElements {
-  const scriptRegex = /<script\b[^>]*(?:src\s*=\s*['"]([^'"]*)['"])?[^>]*>([\s\S]*?)<\/script>/gi;
+  const scriptRegex =
+    /<script\b[^>]*(?:src\s*=\s*['"]([^'"]*)['"])?[^>]*>([\s\S]*?)<\/script>/gi;
   const styleRegex = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
+  const linkRegex = /<link\b[^>]*href\s*=\s*['"]([^'"]*)['"][^>]*>/gi;
   const renderGateRegex = /<render-gate>([\s\S]*?)<\/render-gate>/i;
 
   const scripts: string[] = [];
-  const scriptFunctions: ExtractedElements['scriptFunctions'] = [];
+  const scriptFunctions: string[] = [];
   let match: RegExpExecArray | null;
   while ((match = scriptRegex.exec(htmlString))) {
     const src = match[1];
@@ -30,13 +33,22 @@ function extractElements(htmlString: string): ExtractedElements {
     styles.push(match[0]);
   }
 
+  const links: string[] = [];
+  while ((match = linkRegex.exec(htmlString))) {
+    links.push(match[1]);
+  }
+
   const renderGateMatches = htmlString.match(renderGateRegex);
-  const renderGateContent = renderGateMatches && renderGateMatches.length > 1 ? renderGateMatches[1].trim() : null;
+  const renderGateContent =
+    renderGateMatches && renderGateMatches.length > 1
+      ? renderGateMatches[1].trim()
+      : null;
 
   return {
     scripts,
     scriptFunctions,
     styles,
+    links,
     renderGateContent,
   };
 }
