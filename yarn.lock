@@ -1278,9 +1278,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"astro-onrequest-compile@workspace:.":
+"astro-dynamic-compile@workspace:.":
   version: 0.0.0-use.local
-  resolution: "astro-onrequest-compile@workspace:."
+  resolution: "astro-dynamic-compile@workspace:."
   dependencies:
     "@astrojs/compiler": ^1.5.5
     "@astrojs/react": ^2.2.1
