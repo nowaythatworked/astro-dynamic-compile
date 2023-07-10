@@ -1,0 +1,20 @@
+---
+const components = {
+  component: (await import("../../dynamicComponents/Component.astro")).default,
+  navigation: (await import("../../dynamicComponents/Navigation.astro")).default,
+  counter: (await import("../../dynamicComponents/Counter.astro")).default,
+  props: (await import("../../dynamicComponents/Props.astro")).default,
+  default: (await import("../../dynamicComponents/Default.astro")).default,
+};
+
+const { component } = Astro.params;
+const componentKey = (Object.keys(components).find((c) => c === component) ??
+  "default") as keyof typeof components;
+const ComponentToRender = components[componentKey];
+
+const props = Object.fromEntries(Astro.url.searchParams.entries())
+---
+
+<render-gate>
+  <ComponentToRender {...props}/>
+</render-gate>

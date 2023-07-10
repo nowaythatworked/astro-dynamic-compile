@@ -1,0 +1,23 @@
+{
+  "name": "astro-onrequest-compile",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/compiler": "^1.5.5",
+    "@astrojs/react": "^2.2.1",
+    "@astrojs/vercel": "^3.7.0",
+    "@types/node": "^20.4.1",
+    "@types/react": "^18.2.14",
+    "astro": "^2.8.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "packageManager": "yarn@3.6.1"
+}

@@ -1,0 +1,124 @@
+---
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro</title>
+  </head>
+  <body>
+    <button class="load-component" data-component="navigation"
+      >Navigation</button
+    >
+    <button class="load-component" data-component="component">Component</button>
+    <button class="load-component" data-component="counter"
+      >React Counter</button
+    >
+    <button class="load-component" data-component="default">Default</button>
+    <div>
+      <input id="component-props-text" type="text" />
+      <button id="load-props">With Props</button>
+    </div>
+    <div id="load-zone"></div>
+  </body>
+</html>
+
+<script>
+  import type { ExtractedElements } from "./api/component/[component]";
+
+  const loadZone = document.getElementById("load-zone") as HTMLDivElement;
+
+  type ComponentDomMapping = {
+    scripts: Array<HTMLScriptElement>;
+    scriptFunctions: Array<any>;
+    styles: Array<any>;
+  };
+  const componentsDomMapping: Record<string, ComponentDomMapping> = {};
+
+  const loadComponent = async (
+    component: string,
+    props?: Record<string, string>
+  ) => {
+    const searchParams = props
+      ? "?" + new URLSearchParams(props).toString()
+      : "";
+    const { scripts, scriptFunctions, renderGateContent, styles } = (await (
+      await fetch(`/api/component/${component}${searchParams}`)
+    ).json()) as ExtractedElements;
+    if (!renderGateContent) {
+      loadZone.innerHTML = "Something went wrong.";
+      return;
+    }
+    const componentMapping: ComponentDomMapping = {
+      scripts: [],
+      scriptFunctions: [],
+      styles: [],
+    };
+
+    scripts.map((script) => {
+      if (script.includes(".css")) return;
+      const scriptTag = document.createElement("script");
+      scriptTag.src = script;
+      scriptTag.type = "module";
+      document.body.appendChild(scriptTag);
+      componentMapping.scripts.push(scriptTag);
+    });
+
+    scriptFunctions.forEach((func) => {
+      const scriptTag = document.createElement("script");
+      scriptTag.innerText = func;
+      document.body.appendChild(scriptTag);
+      componentMapping.scriptFunctions.push(scriptTag);
+    });
+
+    loadZone.innerHTML = renderGateContent;
+
+    styles.forEach((style) => {
+      const styleContainerTag = document.createElement("div");
+      styleContainerTag.innerHTML = style;
+      document.body.appendChild(styleContainerTag);
+      componentMapping.styles.push(styleContainerTag);
+    });
+    componentsDomMapping[component] = componentMapping;
+  };
+
+  const removeComponent = (component: string) => {
+    const mappingKey = Object.keys(componentsDomMapping).find(
+      (k) => k === component
+    );
+    if (mappingKey) {
+      const mapping = componentsDomMapping[mappingKey];
+      mapping.scripts.forEach((s) => s.remove());
+      mapping.scriptFunctions.forEach((s) => s.remove());
+      mapping.styles.forEach((s) => s.remove());
+    }
+  };
+
+  const loadComponentButtons = document.getElementsByClassName(
+    "load-component"
+  ) as HTMLCollectionOf<HTMLButtonElement>;
+  for (const button of loadComponentButtons) {
+    const { component } = button.dataset as { component: string };
+    button.addEventListener("click", () => {
+      removeComponent(component);
+      loadComponent(component);
+    });
+  }
+
+  const componentPropsInput = document.getElementById("component-props-text") as HTMLInputElement;
+  componentPropsInput.addEventListener('input', async () => {
+    removeComponent("props");
+    await loadComponent("props", { text: componentPropsInput.value });
+  })
+
+  document.getElementById("load-props")?.addEventListener("click", async () => {
+    const textInput = document.getElementById(
+      "component-props-text"
+    ) as HTMLInputElement;
+    removeComponent("props");
+    await loadComponent("props", { text: textInput.value });
+  });
+</script>
