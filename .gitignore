@@ -15,6 +15,7 @@ pnpm-debug.log*
 .yarn/*
 !.yarn/releases
 !.yarn/patches
+!.yarn/cache
 
 # environment variables
 .env
