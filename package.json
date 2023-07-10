@@ -1,5 +1,5 @@
 {
-  "name": "astro-onrequest-compile",
+  "name": "astro-dynamic-compile",
   "type": "module",
   "version": "0.0.1",
   "scripts": {

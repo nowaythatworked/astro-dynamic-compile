@@ -1,4 +1,4 @@
-# Astro OnRequest Compile
+# Astro Dynamic Compile
 This is a small demo on how you can compile astro components on a per-request-basis.
 Please note, that this is only a proof of conecept.
 
